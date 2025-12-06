@@ -3,8 +3,3 @@
 .DS_Store
 __pycache__/
 *.pyc
-
-# Data
-/data/
-*.gpkg
-*.pkl
