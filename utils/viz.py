@@ -253,28 +253,18 @@ import pydeck as pdk
 
 # ... (previous functions)
 
-def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
-    """Render a 3D Tilted Map using PyDeck."""
-    if geo_data is None or geo_data.empty:
-        st.warning("No geographic data available.")
-        return
-
-    # Debug Info (uncomment if needed)
-    # st.sidebar.markdown("---")
-    # st.sidebar.caption("🛠️ Map Debug Info")
-    # st.sidebar.write(f"Raw CRS: {geo_data.crs}")
-    # st.sidebar.write(f"Raw Bounds: {[int(b) for b in geo_data.total_bounds]}")
-
-    # 1. Coordinate Magnitude Check (The "Segovia Fix")
-    # If coordinates are > 360, it's definitely not WGS84, regardless of what metadata says.
-    # We assume standard France projection (Lambert-93 / EPSG:2154) if values are large.
+@st.cache_data(show_spinner=True)
+def _prepare_3d_data(geo_data, metric):
+    """
+    Preprocess geo_data for 3D mapping. 
+    Handles expensive CRS reprojection, color calculation, and serialization once per metric.
+    """
+    # 1. Coordinate Magnitude Check
     bounds = geo_data.total_bounds
-    is_projected_coords = (bounds[0] > 360 or bounds[1] > 360) # Simple heuristic
+    is_projected_coords = (bounds[0] > 360 or bounds[1] > 360) 
 
     try:
         if is_projected_coords:
-            # st.sidebar.info("Detected projected coords (meters). Reprojecting...")
-            # Force set CRS to Lambert-93 if it's treated as large coordinates
             geo_data_fixed = geo_data.copy()
             geo_data_fixed.set_crs(epsg=2154, allow_override=True, inplace=True)
             geo_data_proj = geo_data_fixed.to_crs(epsg=4326)
@@ -282,53 +272,65 @@ def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
             geo_data_proj = geo_data.to_crs(epsg=4326)
         else:
             geo_data_proj = geo_data.copy()
-            
     except Exception as e:
         st.error(f"CRS Visualization Error: {e}")
-        return
+        return None, None, None, None
 
-    # Center map on the data centroid (MUST use WGS84 coordinates)
-    bounds = geo_data_proj.total_bounds
-    center_lat = (bounds[1] + bounds[3]) / 2
-    center_lon = (bounds[0] + bounds[2]) / 2
-    
-    # st.sidebar.write(f"Center: {center_lat:.4f}, {center_lon:.4f}")
-    
-    label = format_metric_label(metric)
-    
+    # Calculate Center
+    bounds_proj = geo_data_proj.total_bounds
+    center_lat = (bounds_proj[1] + bounds_proj[3]) / 2
+    center_lon = (bounds_proj[0] + bounds_proj[2]) / 2
+
     # Normalize metric for coloring
     min_val = geo_data_proj[metric].min()
     max_val = geo_data_proj[metric].max()
-    
-    # helper to get color from value (simple blue gradient)
+
+    # Optimized color calculation
     def get_color(val):
         norm = (val - min_val) / (max_val - min_val) if max_val > min_val else 0
         r = 220 - int(norm * (220 - 8))
         g = 240 - int(norm * (240 - 48))
         b = 255 - int(norm * (255 - 107))
         return [r, g, b, 160] # Alpha 160
-        
-    geo_data_proj['fill_color'] = geo_data_proj[metric].apply(get_color)
     
-    # Create formatted tooltip value (Python-side formatting is safer)
+    geo_data_proj['fill_color'] = geo_data_proj[metric].apply(get_color)
+
+    # Pre-calculate formatted values
     if "income" in metric:
         geo_data_proj["formatted_val"] = geo_data_proj[metric].apply(lambda x: f"{x:,.0f} €")
     elif "rate" in metric or "pct" in metric:
         geo_data_proj["formatted_val"] = geo_data_proj[metric].apply(lambda x: f"{x:.1f}%")
     else:
         geo_data_proj["formatted_val"] = geo_data_proj[metric].astype(str)
+
+    # Return geo structure via __geo_interface__ for maximum speed (cached)
+    return geo_data_proj.__geo_interface__, center_lat, center_lon, max_val
+
+def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
+    """Render a 3D Tilted Map using PyDeck."""
+    if geo_data is None or geo_data.empty:
+        st.warning("No geographic data available.")
+        return
+
+    # Use cached data preparation
+    geo_data_dict, center_lat, center_lon, max_val = _prepare_3d_data(geo_data, metric)
     
-    # Define Layer using GeoJSON Interface (Safest for complex geometries)
+    if geo_data_dict is None:
+        return
+
+    label = format_metric_label(metric)
+    
+    # Define Layer using GeoJSON Interface
     geojson_layer = pdk.Layer(
         "GeoJsonLayer",
-        data=geo_data_proj.__geo_interface__,
+        data=geo_data_dict, 
         opacity=opacity,
         stroked=True,
         filled=True,
-        extruded=True, # Make it 3D!
+        extruded=True,
         wireframe=True,
         get_elevation=f"properties.{metric}",
-        elevation_scale=10 if max_val < 1000 else 0.1, # Scale elevation based on value magnitude to avoid spikes
+        elevation_scale=10 if max_val < 1000 else 0.1,
         get_fill_color="properties.fill_color",
         get_line_color=[255, 255, 255],
         get_line_width=10,
@@ -341,7 +343,7 @@ def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
         latitude=center_lat,
         longitude=center_lon,
         zoom=9,
-        pitch=45, # Tilted!
+        pitch=45,
         bearing=0
     )
 
@@ -350,8 +352,8 @@ def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
         layers=[geojson_layer],
         initial_view_state=view_state,
         tooltip={"text": "{nom}\n" + label + ": {formatted_val}"},
-        map_style="light", # Clean style
+        map_style="light",
     )
     
-    st.pydeck_chart(r, use_container_width=True, height=height) # Will take full width
+    st.pydeck_chart(r, use_container_width=True, height=height)
 
