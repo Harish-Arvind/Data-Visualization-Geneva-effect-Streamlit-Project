@@ -254,24 +254,24 @@ import pydeck as pdk
 # ... (previous functions)
 
 @st.cache_data(show_spinner=True)
-def _prepare_3d_data(geo_data, metric):
+def _prepare_3d_data(_geo_data, metric):
     """
     Preprocess geo_data for 3D mapping. 
     Handles expensive CRS reprojection, color calculation, and serialization once per metric.
     """
     # 1. Coordinate Magnitude Check
-    bounds = geo_data.total_bounds
+    bounds = _geo_data.total_bounds
     is_projected_coords = (bounds[0] > 360 or bounds[1] > 360) 
 
     try:
         if is_projected_coords:
-            geo_data_fixed = geo_data.copy()
+            geo_data_fixed = _geo_data.copy()
             geo_data_fixed.set_crs(epsg=2154, allow_override=True, inplace=True)
             geo_data_proj = geo_data_fixed.to_crs(epsg=4326)
-        elif geo_data.crs and geo_data.crs.to_string() != "EPSG:4326":
-            geo_data_proj = geo_data.to_crs(epsg=4326)
+        elif _geo_data.crs and _geo_data.crs.to_string() != "EPSG:4326":
+            geo_data_proj = _geo_data.to_crs(epsg=4326)
         else:
-            geo_data_proj = geo_data.copy()
+            geo_data_proj = _geo_data.copy()
     except Exception as e:
         st.error(f"CRS Visualization Error: {e}")
         return None, None, None, None
@@ -313,6 +313,8 @@ def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
         return
 
     # Use cached data preparation
+    # Note: Streamlit uses the un-underscored name for the call, but looking at the definition
+    # it sees _geo_data and knows to skip hashing it.
     geo_data_dict, center_lat, center_lon, max_val = _prepare_3d_data(geo_data, metric)
     
     if geo_data_dict is None:
