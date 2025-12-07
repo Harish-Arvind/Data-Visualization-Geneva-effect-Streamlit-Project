@@ -2,11 +2,15 @@ import streamlit as st
 from utils.io import load_data
 from utils.prep import make_tables
 from sections import intro, overview, deep_dives, conclusions
+from utils.constants import (
+    PAGE_TITLE, PAGE_ICON, CACHE_FILE, AVAILABLE_YEARS, 
+    DEFAULT_YEAR, METRICS, METRIC_LABELS
+)
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="France Wealth Geography",
-    page_icon="🇫🇷",
+    page_title=PAGE_TITLE,
+    page_icon=PAGE_ICON,
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -36,7 +40,7 @@ st.markdown("""
 
 @st.cache_data(show_spinner=False)
 def get_app_data():
-    CACHE_FILE = "data/processed_metrics_cache.pkl"
+    # CACHE_FILE is imported from constants
     
     # 1. Try Loading from Disk
     if os.path.exists(CACHE_FILE):
@@ -100,21 +104,15 @@ def main():
             
         # Common Filters
         # 2. Year Selection - Improved Interaction
-        avail_years = [2015, 2017, 2019]
-        # Use a slider for a clearer "timeline" feel, forcing single selection but implying continuity
-        focus_year = st.select_slider("Select Data Year", options=avail_years, value=2019)
+        avail_years = AVAILABLE_YEARS
+        # Use a slider for a clearer "timeline" feel
+        focus_year = st.select_slider("Select Data Year", options=avail_years, value=DEFAULT_YEAR)
         
-        # Logic: We keep all years up to the focus year for trends, but the 'latest' will be the focus_year.
-        # This solves the user confusion: they pick '2019', they get 2019 as the main view.
-        # But we still pass history for the trend charts.
+        # Logic: We keep all years up to the focus year for trends
         selected_years = [y for y in avail_years if y <= focus_year]
         
-        metric_options = [
-            "avg_income", "poverty_rate", "ownership_rate", "social_housing_rate",
-            "youth_pct", "senior_pct", "single_parent_pct", 
-            "old_housing_pct", "new_housing_pct", "houses_pct", "apartments_pct"
-        ]
-        metric = st.selectbox("Primary Metric", metric_options, format_func=lambda x: x.replace("_", " ").title())
+        metric_options = METRICS
+        metric = st.selectbox("Primary Metric", metric_options, format_func=lambda x: METRIC_LABELS.get(x, x))
         
         # Region Filter for Deep Dives & Overview (Map Pin-pointing)
         selected_regions = []
@@ -134,8 +132,8 @@ def main():
             selected_regions = st.multiselect(label, all_communes, default=default_regions if page == "Deep Dives" else [])
 
         if st.button("🔄 Reset Cache"):
-            if os.path.exists("data/processed_metrics_cache.pkl"):
-                os.remove("data/processed_metrics_cache.pkl")
+            if os.path.exists(CACHE_FILE):
+                os.remove(CACHE_FILE)
                 st.cache_data.clear()
                 st.rerun()
 

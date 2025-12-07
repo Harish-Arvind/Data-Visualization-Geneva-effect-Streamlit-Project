@@ -30,11 +30,19 @@ Our data analysis reveals three structural forces shaping the territory:
 
 ---
 
-## 🛠️ Technical Stack
+## � Project Structure
+Key files ensuring reproducibility and clean architecture:
+*   `utils/constants.py`: Centralized configuration (URLs, metrics, year definitions) to avoid "magic numbers".
+*   `scripts/download_data.py`: Intelligent script that fetches data from INSEE/GitHub, handling caching and format conversion automatically.
+*   `Makefile`: Simple command interface for installation and execution.
+*   `.devcontainer/`: Configuration for VS Code Dev Containers (Docker-based environment).
+
+## �🛠️ Technical Stack
 *   **Core:** Python 3.9+, Streamlit
 *   **Data Processing:** Pandas, GeoPandas, Shapely
 *   **Visualization:** Plotly Express, PyDeck (3D Maps), Folium
-*   **Data Source:** [INSEE Filosofi (2015-2019)](https://www.data.gouv.fr/fr/datasets/revenus-pauvrete-et-niveau-de-vie-donnees-carroyees/)
+*   **Data Source:** [INSEE Filosofi (2015-2019)](https://www.data.gouv.fr/fr/datasets/revenus-pauvrete-et-niveau-de-vie-donnees-carroyees/) & [France-GeoJSON](https://github.com/gregoiredavid/france-geojson) (Communes)
+*   **Environment:** Includes `.devcontainer` and `Makefile` for full reproducibility.
 
 ## 🚀 Local Installation
 1.  **Clone the repository:**
@@ -43,15 +51,19 @@ Our data analysis reveals three structural forces shaping the territory:
     cd Data-Visualization-Geneva-effect-Streamlit-Project
     ```
 
-2.  **Install dependencies:**
+2.  **Setup Environment & Data:**
+    This project uses a **Makefile** for easy setup. This command will install dependencies and automatically download the required data (INSEE & GeoJSON) for you.
     ```bash
-    pip install -r requirements.txt
+    make install
+    make download
     ```
+    *(Note: Data is downloaded from official INSEE sources and GitHub. The script automatically handles extraction and conversion.)*
 
 3.  **Run the App:**
     ```bash
-    streamlit run app.py
+    make run
     ```
+    *Or manually: `streamlit run app.py`*
     
 ---
 **Author:** Harish EFREI | **Institution:** EFREI Paris Panthéon-Assas
