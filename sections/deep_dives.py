@@ -79,13 +79,18 @@ def render(tables, metric="avg_income", regions=None, selected_years=None):
             
             # Geneva Proximity Insight
             if 'dist_geneva_km' in top_data.columns:
-                n_near_geneva = top_data[top_data['dist_geneva_km'] < 20].shape[0]
-                st.caption(f"🇨🇭 **Geneva Gravity Check:** {n_near_geneva} out of these 20 communes are located within **20km** of Geneva.")
+                n_near_geneva = top_data[top_data['dist_geneva_km'] < 100].shape[0]
+                st.caption(f"🇨🇭 **Geneva Gravity Check:** {n_near_geneva} out of these 20 communes are located within **100km** of Geneva.")
         else:
             # Custom Comparison
+            # Ensure no duplicate metrics if 'metric' is already in the hardcoded list
+            # We must include 'avg_income' because it is used as a fallback 'sec_metric' below.
+            extra_metrics = ['avg_income', 'poverty_rate', 'total_pop', 'ownership_rate', 'youth_pct', 'social_housing_rate']
+            comp_metrics = [metric] + [m for m in extra_metrics if m != metric]
+
             comp_data_full = get_commune_comparison(
                 df_regions, regions, 
-                [metric, 'poverty_rate', 'total_pop', 'ownership_rate', 'youth_pct', 'social_housing_rate']
+                comp_metrics
             )
             
             if not comp_data_full.empty:
