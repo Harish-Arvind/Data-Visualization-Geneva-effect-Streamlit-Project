@@ -65,7 +65,7 @@ def get_app_data():
 def main():
     # --- Sidebar Navigation ---
     with st.sidebar:
-        st.title("🇫🇷 Wealth Atlas")
+        st.title("🇫🇷 The Geneva Effect")
         st.caption("v2.1 | EFREI Data Story")
         
         # Navigation with Icons

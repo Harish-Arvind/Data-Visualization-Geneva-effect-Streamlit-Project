@@ -1,8 +1,8 @@
 import streamlit as st
 
 def render():
-    st.markdown("<h1 style='text-align: center; '>🇫🇷 The Hidden Geography of Wealth</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center; '>An interactive exploration of inequality in France (2015-2019)</h3>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; '>🇫🇷 The Geneva Effect: Mapping Wealth on the French Border</h1>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; '>Analyzing the Socioeconomic Impact of Cross-Border Wealth (2015-2019)</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([1.5, 1])
@@ -11,14 +11,14 @@ def render():
         st.markdown("""
         <div style='font-size: 1.1rem; line-height: 1.6;'>
         <strong>The Core Question:</strong><br>
-        <em>How does proximity to a global economic hub (Geneva) reshape the local socioeconomic fabric?</em><br><br>
+        <em>As the French economy improves nationwide, does the "Geneva Effect" still dominate local prosperity?</em><br><br>
         
         <strong>The Narrative Arc:</strong>
-        This project explores the <strong>"Geneva Effect"</strong>—<em>the transformation of French border towns into wealthy enclaves due to high Swiss salaries</em>—through three lenses:
+        This project explores the tension between <strong>National Growth</strong> and <strong>Border Dominance</strong>. While wealth is rising generally, the gravitational pull of Geneva creates a unique distortion:
         <ul style="margin-top: 5px;">
-            <li>💰 <strong>Wealth Shift:</strong> How "Frontalier" communes (like Archamps) are overtaking historic centers.</li>
-            <li>🏘️ <strong>The Fortress:</strong> How the housing market remains rigid to maintain exclusivity.</li>
-            <li>👶 <strong>Rejuvenation:</strong> The surprising demographic crossover where youth are returning.</li>
+            <li>💰 <strong>Wealth Shift:</strong> How "Frontalier" communes are capturing the lion's share of regional growth.</li>
+            <li>🏘️ <strong>The Fortress:</strong> How extreme housing pressure locks out the middle class despite rising incomes.</li>
+            <li>👶 <strong>Rejuvenation:</strong> The surprising demographic crossover where young families return to the border.</li>
         </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -31,7 +31,7 @@ def render():
             *   **Sourcing:** Data is sourced from the official **INSEE Filosofi** datasets at the 1km grid level, aggregated to communes.
             *   **Cleaning:** Missing values in demographic breakdowns were imputed with 0 where appropriate (sparse population).
             *   **Validation:** We filtered for communes with complete income data to ensure the "Avg Income" rankings are robust.
-            *   **Limitations:** The analysis focuses on valid residential tax households; collective housing (dorms, institutions) is excluded and the is no data for Paris region.
+            *   **Limitations:** The analysis focuses on valid residential tax households; collective housing (dorms, institutions) is excluded and there is no data for Paris region.
             """)
         
     with col2:
@@ -49,7 +49,7 @@ def render():
                 <li><strong>🗓️ Year Filter</strong>: Toggle between <strong>2015, 2017, and 2019</strong> to see how data evolves over time.</li>
                 <li><strong>📊 Primary Metric</strong>: Select the main variable (e.g., <em>Poverty Rate</em>) to update all maps and charts.</li>
                 <li><strong>📍 Commune Filter</strong>: Search for specific cities (e.g., <em>"Paris"</em>) to compare them in the Deep Dives section.</li>
-                <li><strong>ℹ️Reset Cache</strong>: Option to reset the cache and by clearing the saved cache data and start from new</li>
+                <li><strong>ℹ️Reset Cache</strong>: Option to reset the cache and by clearing the saved cache data and you can start new.</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)

@@ -2,11 +2,11 @@ import streamlit as st
 from utils.viz import line_chart, bar_chart, map_chart_3d
 
 def render(tables, metric="avg_income", selected_years=None):
-    st.header("National Overview")
+    st.header("National Overview: Is the Rising Tide Tilted Towards Geneva?")
     
     st.markdown("""
     > **💡 Headline Insight:**  
-    > *Growth is visible but uneven—while average income is rising, the gap between the 'Frontalier' elite and the rural periphery is widening.*
+    > *While the French economy shows broad improvement over time, the **'Geneva Effect'** creates an extreme gravitational pull, concentrating wealth disproportionately along the border.*
     """)
     
     
@@ -59,7 +59,7 @@ def render(tables, metric="avg_income", selected_years=None):
     
     # --- Visualizations ---
     # 1. Trends Section (Full Width)
-    st.subheader("National Trends")
+    st.subheader("National Growth Dynamics (The Rising Tide)")
     # Use Bar Chart if few years, otherwise Line
     if len(ts_data) <= 5:
         # Bar chart for distinct years is sometimes clearer for small N
@@ -95,7 +95,7 @@ def render(tables, metric="avg_income", selected_years=None):
     st.markdown("---")
 
     # 2. Map Section (Full Width, Large)
-    st.subheader("Geographic Distribution (3D)")
+    st.subheader("The Gravity of Geneva: Geographic Wealth Concentration")
     st.caption("Interactive 3D Map • Tilt: 45° • Height: Scale based on value")
     
     map_chart_3d(geo_data, metric, height=700)
