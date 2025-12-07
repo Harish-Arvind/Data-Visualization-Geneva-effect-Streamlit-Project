@@ -99,7 +99,7 @@ def download_communes():
         # Keep old file if failure?
         print(f"❌ Error downloading/processing communes: {e}")
 
-if __name__ == "__main__":
+def download_all():
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
         
@@ -114,3 +114,6 @@ if __name__ == "__main__":
     download_communes()
     
     print("\nDone.")
+
+if __name__ == "__main__":
+    download_all()

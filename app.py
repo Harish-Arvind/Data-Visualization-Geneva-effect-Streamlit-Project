@@ -2,6 +2,7 @@ import streamlit as st
 from utils.io import load_data
 from utils.prep import make_tables
 from sections import intro, overview, deep_dives, conclusions
+from scripts.download_data import download_all
 from utils.constants import (
     PAGE_TITLE, PAGE_ICON, CACHE_FILE, AVAILABLE_YEARS, 
     DEFAULT_YEAR, METRICS, METRIC_LABELS
@@ -95,7 +96,8 @@ def main():
         st.subheader("Global Filters")
         
         # Load Data
-        with st.spinner("Loading data engine..."):
+        with st.spinner("Checking and downloading data..."):
+            download_all()
             tables = get_app_data()
         
         if not tables:
