@@ -65,6 +65,10 @@ def get_app_data():
 def main():
     # --- Sidebar Navigation ---
     with st.sidebar:
+        # Logo
+        if os.path.exists("assets/efrei_logo.png"):
+             st.image("assets/efrei_logo.png", use_container_width=True)
+        
         st.title("🇫🇷 The Geneva Effect")
         st.caption("v2.1 | EFREI Data Story")
         
