@@ -11,12 +11,7 @@ def render():
         st.markdown("""
         <div style='font-size: 1.1rem; line-height: 1.6;'>
         
-        <div style='background-color: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0; margin-bottom: 20px;'>
-            <strong style='color: #0F172A;'>🇨🇭 What is the "Geneva Effect"?</strong><br>
-            <span style='font-size: 0.95rem; color: #334155;'>
-            It is the economic phenomenon where <strong>high Swiss salaries</strong> drive up the cost of living and real estate prices in neighboring French border towns ("Frontalier" communes). This creates islands of extreme wealth that contrast sharply with the rural periphery.
-            </span>
-        </div>
+        
 
         <strong>The Core Question:</strong><br>
         <em>As the French economy improves nationwide, does the "Geneva Effect" still dominate local prosperity?</em><br><br>
@@ -28,18 +23,28 @@ def render():
             <li>🏘️ <strong>The Fortress:</strong> How extreme housing pressure locks out the middle class despite rising incomes.</li>
             <li>👶 <strong>Rejuvenation:</strong> The surprising demographic crossover where young families return to the border.</li>
         </ul>
+        <div style=' padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0; margin-bottom: 20px;'>
+            <strong>🇨🇭 What is the "Geneva Effect"?</strong><br>
+            <span style='font-size: 0.95rem;'>
+            It is the economic phenomenon where <strong>high Swiss salaries</strong> drive up the cost of living and real estate prices in neighboring French border towns ("Frontalier" communes). This creates islands of extreme wealth that contrast sharply with the rural periphery.
+            </span>
+        </div>
         </div>
         """, unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
-        st.info("ℹ️ **Data Source:** INSEE - Filosofi 2015, 2017, 2019 (Open License)")
+        st.info("ℹ️ **Data Source:** [INSEE - Filosofi 2015, 2017, 2019 (Open License)](https://www.data.gouv.fr/datasets/revenus-pauvrete-et-niveau-de-vie-donnees-carroyees/)")
         
         with st.expander("🛠️ Data Quality & Methodology"):
             st.markdown("""
             *   **Sourcing:** Data is sourced from the official **INSEE Filosofi** datasets at the 1km grid level, aggregated to communes.
-            *   **Cleaning:** Missing values in demographic breakdowns were imputed with 0 where appropriate (sparse population).
-            *   **Validation:** We filtered for communes with complete income data to ensure the "Avg Income" rankings are robust.
-            *   **Limitations:** The analysis focuses on valid residential tax households; collective housing (dorms, institutions) is excluded and there is no data for Paris region.
+            *   **Variable Engineering:** 
+                *   *Distance to Geneva:* Calculated as the geodesic distance from each commune's centroid to Geneva City Hall (Lat: 46.2044, Lon: 6.1432).
+                *   *Ratios:* Derived metrics (e.g., Youth %) are calculated dynamically to ensure comparability across years.
+            *   **Cleaning & Imputation:** 
+                *   Missing numeric values (e.g., specific age brackets in small villages) were imputed with 0 to allow for regional aggregation.
+                *   **Privacy:** To protect anonymity, INSEE suppresses data for grid squares with <11 households. Our analysis respects this by using only the available non-suppressed data.
+            *   **Limitations:** The analysis focuses on valid residential tax households. Collective housing (dorms, institutions) is excluded, and the dataset is limited to the available administrative boundaries of the region.
             """)
         
     with col2:

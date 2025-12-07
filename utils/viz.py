@@ -40,6 +40,8 @@ def _apply_layout(fig, title, x_title, y_title):
 
 def format_metric_label(metric):
     """Helper to format metric names."""
+    if metric == 'dist_geneva_km':
+        return "Distance to Geneva (km)"
     return metric.replace("_", " ").title()
 
 def line_chart(data, metric, title=None):

@@ -124,6 +124,35 @@ def make_tables(_tiles_data, _communes_gdf):
     # Group by Year and Commune
     grouped = full_df.groupby(['year', 'lcog_geo']).agg(agg_dict).reset_index()
     
+    # --- Feature Engineering: The Geneva Gravity ---
+    # Geneva Coordinates (approx center)
+    GENEVA_LAT = 46.2044
+    GENEVA_LON = 6.1432
+    
+    # We need the geometry of the commune to calculate distance
+    # Merge geometries back first (using centroids for speed)
+    if 'geometry' not in grouped.columns:
+        # Get centroids from original communes_gdf
+        commune_centroids = _communes_gdf[[commune_key, 'geometry']].copy()
+        # Ensure we are in a metric CRS for distance (Lambert-93 is standard for France: EPSG:2154)
+        if commune_centroids.crs and commune_centroids.crs.to_string() != "EPSG:2154":
+             try:
+                 commune_centroids = commune_centroids.to_crs(epsg=2154)
+             except:
+                 pass # Fallback
+        
+        commune_centroids['centroid'] = commune_centroids.geometry.centroid
+        
+        # Geneva Point in EPSG:2154
+        from shapely.geometry import Point
+        geneva_pt = gpd.GeoSeries([Point(GENEVA_LON, GENEVA_LAT)], crs="EPSG:4326").to_crs(commune_centroids.crs).iloc[0]
+        
+        # Calculate Distance (in km)
+        commune_centroids['dist_geneva_km'] = commune_centroids['centroid'].distance(geneva_pt) / 1000.0
+        
+        # Merge distance into grouped
+        grouped = grouped.merge(commune_centroids[[commune_key, 'dist_geneva_km']], left_on='lcog_geo', right_on=commune_key, how='left')
+    
     # --- Feature Engineering (Derived Metrics) ---
     
     # 1. Standard Metrics

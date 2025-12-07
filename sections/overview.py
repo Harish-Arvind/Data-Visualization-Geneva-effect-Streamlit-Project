@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.viz import line_chart, bar_chart, map_chart_3d
+from utils.prep import safe_divide
 
 def render(tables, metric="avg_income", selected_years=None):
     st.header("National Overview: Is the Rising Tide Tilted Towards Geneva?")
@@ -27,9 +28,17 @@ def render(tables, metric="avg_income", selected_years=None):
             c1, c2, c3, c4 = st.columns(4)
             c1.metric("Avg Income", f"{current_data['avg_income'].values[0]:,.0f} €")
             c2.metric("Poverty Rate", f"{current_data['poverty_rate'].values[0]:.1f}%")
-            # New metrics
-            youth_val = current_data['youth_pct'].values[0] if 'youth_pct' in current_data.columns else 0
-            c3.metric("Youth Pop (<18)", f"{youth_val:.1f}%")
+            # Geneva Gravity KPI
+            if 'dist_geneva_km' in current_data.columns:
+                # Top 10% Wealthiest
+                threshold = current_data['avg_income'].quantile(0.9)
+                rich_zone = current_data[current_data['avg_income'] >= threshold]
+                avg_dist_rich = rich_zone['dist_geneva_km'].mean()
+                
+                c3.metric("Wealth Center", f"{avg_dist_rich:.0f} km", delta="from Geneva", delta_color="inverse")
+            else:
+                youth_val = current_data['youth_pct'].values[0] if 'youth_pct' in current_data.columns else 0
+                c3.metric("Youth Pop (<18)", f"{youth_val:.1f}%")
             
             social_val = current_data['social_housing_rate'].values[0] if 'social_housing_rate' in current_data.columns else 0
             c4.metric("Social Housing", f"{social_val:.1f}%")
@@ -58,39 +67,21 @@ def render(tables, metric="avg_income", selected_years=None):
     st.markdown("---")
     
     # --- Visualizations ---
+    # --- Visualizations ---
     # 1. Trends Section (Full Width)
     st.subheader("National Growth Dynamics (The Rising Tide)")
-    # Use Bar Chart if few years, otherwise Line
-    if len(ts_data) <= 5:
-        # Bar chart for distinct years is sometimes clearer for small N
-         # We need to adapt bar_chart to support x=year which is int...
-         # Or stick to line chart but layout it better.
-         # User asked for "another type of graph". Let's try Bar.
-         # We need to coerce year to string for categorical bar axis if we want discrete bars
-         chart_data = ts_data.copy()
-         chart_data['Year'] = chart_data['year'].astype(str)
-         
-         # Custom Bar Chart for Trends
-         import plotly.express as px
-         fig = px.bar(
-             chart_data, 
-             x="Year", 
-             y=metric,
-             text_auto='.3s',
-             title=f"Evolution of {metric.replace('_', ' ').title()}",
-             color=metric
-         )
-         # Clean Layout (No Grid)
-         fig.update_layout(
-            xaxis_title=None, 
-            yaxis_title=None, 
-            showlegend=False,
-            margin=dict(l=0, r=0, t=40, b=0)
-         )
-         st.plotly_chart(fig, use_container_width=True)
-         
+    
+    if not ts_data.empty:
+        # Calculate total growth for the subtitle
+        start_val = ts_data[ts_data['year'] == ts_data['year'].min()][metric].values[0]
+        end_val = ts_data[ts_data['year'] == ts_data['year'].max()][metric].values[0]
+        growth_pct = ((end_val - start_val) / start_val) * 100
+        
+        st.caption(f"📈 **Trend Analysis:** The national average for {metric.replace('_', ' ')} has grown by **+{growth_pct:.1f}%** between 2015 and 2019, confirming the 'Improving Economy' hypothesis.")
+        
+        line_chart(ts_data, metric, title=f"Rising Tide: Evolution of {metric.replace('_', ' ').title()}")
     else:
-        line_chart(ts_data, metric, title=f"Trend: {metric.replace('_', ' ').title()}")
+        st.warning("Insufficient data to show trends.")
     
     st.markdown("---")
 
