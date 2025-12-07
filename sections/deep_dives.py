@@ -79,8 +79,8 @@ def render(tables, metric="avg_income", regions=None, selected_years=None):
             
             # Geneva Proximity Insight
             if 'dist_geneva_km' in top_data.columns:
-                n_near_geneva = top_data[top_data['dist_geneva_km'] < 100].shape[0]
-                st.caption(f"🇨🇭 **Geneva Gravity Check:** {n_near_geneva} out of these 20 communes are located within **100km** of Geneva.")
+                n_near_geneva = top_data[top_data['dist_geneva_km'] < 20].shape[0]
+                st.caption(f"🇨🇭 **Geneva Gravity Check:** {n_near_geneva} out of these 20 communes are located within **20km** of Geneva.")
         else:
             # Custom Comparison
             # Ensure no duplicate metrics if 'metric' is already in the hardcoded list
