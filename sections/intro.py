@@ -10,6 +10,14 @@ def render():
     with col1:
         st.markdown("""
         <div style='font-size: 1.1rem; line-height: 1.6;'>
+        
+        <div style='background-color: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0; margin-bottom: 20px;'>
+            <strong style='color: #0F172A;'>🇨🇭 What is the "Geneva Effect"?</strong><br>
+            <span style='font-size: 0.95rem; color: #334155;'>
+            It is the economic phenomenon where <strong>high Swiss salaries</strong> drive up the cost of living and real estate prices in neighboring French border towns ("Frontalier" communes). This creates islands of extreme wealth that contrast sharply with the rural periphery.
+            </span>
+        </div>
+
         <strong>The Core Question:</strong><br>
         <em>As the French economy improves nationwide, does the "Geneva Effect" still dominate local prosperity?</em><br><br>
         
