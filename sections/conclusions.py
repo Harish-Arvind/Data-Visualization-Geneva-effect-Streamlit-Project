@@ -1,50 +1,76 @@
 import streamlit as st
 
 def render():
-    st.header("🏁 Strategic Conclusions: A Territory in Transformation")
+    st.header("🏁 Final Verdict: The Triumph of Gravity")
     
     st.markdown("""
-    Our multidimensional analysis of the 2015-2019 period allows us to answer our core question: 
-    *How does the gravitational pull of Geneva reshape the local socioeconomic fabric?*
+    At the start of this project, we asked a simple question: **Is the region's growth benefiting everyone equally?**
+    
+    After analyzing thousands of data points for every commune, the answer is clear: **No. The "Geneva Effect" is the single most powerful force shaping our territory.** It creates a landscape where your distance from the border dictates your destiny.
     """)
 
-    # --- Pillar 1: The Wealth Engine ---
-    st.markdown("### 1. The Geneva Hyper-Gradient 💸")
-    st.info("""
-    **Conclusion:** The territory is defined not by a smooth economic transition, but by a sharp **"Wealth Cliff"**.
+    st.markdown("---")
+
+    # --- Section 1: The Three Main Lessons ---
+    st.markdown("### 🔍 The Three Key Lessons from the Data")
     
-    *   **The Findings:** Communes within the immediate "Frontalier" belt (Archamps, Sauverny) have decoupled from the national trend, achieving income levels (>50k€) that rival Parisian hubs.
-    *   **The Mechanism:** This is a direct importation of purchasing power. The "Geneva Effect" is an external economic shock that local wealth creation cannot replicate.
-    *   **The Risk:** A "two-speed" territory where the gap between the border elite and the rural interior (the "valleys" in our 3D map) widens, potentially creating social friction.
+    c1, c2, c3 = st.columns(3)
+    
+    with c1:
+        st.info("**1. The \"Wealth Cliff\"**")
+        st.markdown("""
+        **What we saw:** 
+        As soon as you move just **15km** away from Geneva, the average income drops dramatically.
+        
+        **What it means:** 
+        This is not a "regional" economy. It is a **dormitory economy**. The wealth here is not being created by local businesses; it is being "imported" by workers commuting to Switzerland. If you are close to the border, you are wealthy. If you are far, you are not.
+        """)
+        
+    with c2:
+        st.error("**2. The \"Iron Curtain\" of Prices**")
+        st.markdown("""
+        **What we saw:** 
+        There is a massive **-0.65 correlation** between Wealth and Poverty.
+        
+        **What it means:** 
+        Usually, rich and poor areas can coexist. Here, they do not. The Swiss salaries drive up real estate prices so high that they create an invisible wall. Low-income families are literally **priced out** of the border zone and forced to move further inland.
+        """)
+        
+    with c3:
+        st.success("**3. Construction is Youth**")
+        st.markdown("""
+        **What we saw:** 
+        The only places with a growing population of children are the places building **New Housing**.
+        
+        **What it means:** 
+        Young families cannot afford the old, expensive villas near the border. They only move to where new, affordable apartments are being built. **No construction = No young families.**
+        """)
+
+    # --- Section 2: The Big Picture ---
+    st.markdown("---")
+    st.markdown("### 🏰 The Big Picture: The \"Golden Ghetto\" Trap")
+    
+    st.markdown("""
+    When we put all these pieces together, we see a dangerous trend. The territory is becoming a **"Golden Ghetto"**:
+    
+    *   ✅ It is extremely **Wealthy** (thanks to Geneva).
+    *   ✅ It is extremely **Safe** and well-maintained.
+    *   ⚠️ **BUT:** It is freezing out the middle class (teachers, nurses, service workers) who simply cannot afford to live here anymore.
+    
+    The territory is slowly turning into a luxury retirement home and a sleeping zone for wealthy commuters, losing its social diversity.
     """)
+
+    # --- Section 3: Recommendation ---
+    st.markdown("---")
+    st.subheader("🚀 What Must Be Done?")
     
-    # --- Pillar 2: The Zoning Paradox ---
-    st.markdown("### 2. The Zoning Paradox 🏡")
     st.warning("""
-    **Conclusion:** The housing market is a **"Golden Cage"**—wealthy, stable, but rigid.
+    **To fix this, we need a new strategy:**
     
-    *   **The Findings:** With **90%+ individual houses** and **invariant Social Housing rates (~3.7%)**, the territory has effectively "zoned out" lower-income diversity.
-    *   **The Mechanism:** High correlations between `Avg Income` and `Home Ownership` prove that wealth here is essentially a function of real estate access.
-    *   **The Risk:** This rigidity creates a "Fortress Effect," preventing middle-class service workers (teachers, nurses) from living where they work, exacerbating traffic and labor shortages.
-    """)
-
-    # --- Pillar 3: The Demographic Pivot ---
-    st.markdown("### 3. The Future: A Rejuvenation Pivot? 👶")
-    st.success("""
-    **Conclusion:** Against the odds, the territory is **getting younger**, driven by construction.
+    We cannot change geography (Geneva will always be there). But we **can** change how we build.
     
-    *   **The Findings:** Our scatter plots reveal a robust link: **New Housing = New Families**. The positive deviation in youth projection for 2025 suggests the area is successfully attracting a new generation.
-    *   **The Mechanism:** Development projects are working. They are the only effective lever to counter the natural aging of historic populations.
-    *   **The Opportunity:** To sustain this, the "Fortress" must open its gates slightly—building varied housing types to accommodate these young families who may not yet afford the "Villa Standard."
-    """)
-
-    st.markdown("---")
+    The data proves that **building diverse housing (apartments, social housing, townhouses)** is the ONLY way to bring young families and essential workers back into the wealthy zones. 
     
-    st.subheader("🚀 Final Recommendation")
-    st.markdown("""
-    > **For Policymakers:**
-    > *The "Geneva Effect" brings wealth, but urban planning distributes it. To avoid becoming a dormitory for the ultra-wealthy, the territory must prioritize **diversified housing stock**. The data proves that where we build, the youth follow. The path to a balanced future lies in breaking the "Single-Family Zoning" lock.*
+    *   **If we do nothing:** The "Gravity" will continue to segregate the region.
+    *   **If we build smart:** We can use the wealth from Geneva to build a balanced, vibrant community for everyone.
     """)
-
-    st.markdown("---")
-    st.caption("Data Quality Note: Analysis based on INSEE Filosofi 2015-2019. See 'Introduction' for full methodology.")

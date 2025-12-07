@@ -95,10 +95,15 @@ def main():
             st.stop()
             
         # Common Filters
-        # 2. Year Selection
-        # Available years are in tables['raw_grouped'] or similar, hardcoding for now as verified
+        # 2. Year Selection - Improved Interaction
         avail_years = [2015, 2017, 2019]
-        selected_years = st.multiselect("Select Years", avail_years, default=[2015, 2017, 2019])
+        # Use a slider for a clearer "timeline" feel, forcing single selection but implying continuity
+        focus_year = st.select_slider("Select Data Year", options=avail_years, value=2019)
+        
+        # Logic: We keep all years up to the focus year for trends, but the 'latest' will be the focus_year.
+        # This solves the user confusion: they pick '2019', they get 2019 as the main view.
+        # But we still pass history for the trend charts.
+        selected_years = [y for y in avail_years if y <= focus_year]
         
         metric_options = [
             "avg_income", "poverty_rate", "ownership_rate", "social_housing_rate",
@@ -107,13 +112,22 @@ def main():
         ]
         metric = st.selectbox("Primary Metric", metric_options, format_func=lambda x: x.replace("_", " ").title())
         
-        # Region Filter for Deep Dives
+        # Region Filter for Deep Dives & Overview (Map Pin-pointing)
         selected_regions = []
-        if page == "Deep Dives":
+        if page in ["Overview", "Deep Dives"]:
             # 3. Region Filter
             all_communes = sorted(tables['by_region']['nom'].unique().tolist())
-            default_regions = all_communes[:4] if len(all_communes) > 4 else all_communes
-            selected_regions = st.multiselect("Select Communes to Compare", all_communes, default=[])
+            # Default empty for Overview to show full map initially
+            default_regions = [] 
+            if page == "Deep Dives":
+                 # Pre-select for deep dives demo if desired, or keep empty
+                 default_regions = all_communes[:4] if len(all_communes) > 4 else all_communes
+                 # Reset default for Deep Dives to empty if user prefers, but existing logic had defaults. 
+                 # Let's keep existing default logic for Deep Dives but empty for Overview.
+                 pass
+
+            label = "Select Communes to Compare" if page == "Deep Dives" else "🔎 Pinpoint Commune on Map"
+            selected_regions = st.multiselect(label, all_communes, default=default_regions if page == "Deep Dives" else [])
 
         if st.button("🔄 Reset Cache"):
             if os.path.exists("data/processed_metrics_cache.pkl"):
@@ -126,7 +140,12 @@ def main():
         intro.render()
         
     elif page == "Overview":
-        overview.render(tables, metric=metric if 'metric' in locals() else "avg_income", selected_years=selected_years)
+        overview.render(
+            tables, 
+            metric=metric if 'metric' in locals() else "avg_income", 
+            selected_years=selected_years,
+            regions=selected_regions
+        )
         
     elif page == "Deep Dives":
         deep_dives.render(tables, metric=metric if 'metric' in locals() else "avg_income", regions=selected_regions, selected_years=selected_years)

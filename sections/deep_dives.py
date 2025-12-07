@@ -46,8 +46,8 @@ def render(tables, metric="avg_income", regions=None, selected_years=None):
             st.markdown("### 📉 The Decay Curve: Income vs. Distance")
             scatter_plot(
                 latest_data, 
-                x_col='dist_geneva_km', 
-                y_col='avg_income', 
+                x='dist_geneva_km', 
+                y='avg_income', 
                 size='total_pop', 
                 color='poverty_rate', # Color by poverty to show the flip side
                 hover_name='nom',
@@ -76,6 +76,11 @@ def render(tables, metric="avg_income", regions=None, selected_years=None):
             st.info("💡 Select communes in the sidebar for a custom comparison. Showing Top 20 by default.")
             top_data = latest_data.sort_values(metric, ascending=False).head(20)
             bar_chart(top_data, metric, top_n=20, orientation='h', year=latest_year)
+            
+            # Geneva Proximity Insight
+            if 'dist_geneva_km' in top_data.columns:
+                n_near_geneva = top_data[top_data['dist_geneva_km'] < 20].shape[0]
+                st.caption(f"🇨🇭 **Geneva Gravity Check:** {n_near_geneva} out of these 20 communes are located within **20km** of Geneva.")
         else:
             # Custom Comparison
             comp_data_full = get_commune_comparison(
@@ -128,8 +133,8 @@ def render(tables, metric="avg_income", regions=None, selected_years=None):
         *This confirms our hypothesis: Geography (specifically proximity to economic powerhouses like Geneva) is a primary determinant of communal wealth in this territory.*
         """)
 
-    # --- Tab 2: Correlations ---
-    with tab2:
+    # --- Tab 3: Correlations ---
+    with tab3:
         st.subheader("Variable Correlations")
         st.markdown("Explore how different socioeconomic factors relate to each other.")
         
@@ -148,19 +153,24 @@ def render(tables, metric="avg_income", regions=None, selected_years=None):
         correlation_matrix(latest_data, selected_corr_metrics, year=latest_year)
         
         st.markdown("""
-        ### Principal Statement: The "Triangle of Inequality"
+        ### 🧬 Data-Driven Insights: Decoding the Matrix
         
-        Our analysis reveals three structural divides shaping French territories:
+        The correlation matrix above acts as a "truth table" for our territory, revealing three undeniable laws:
         
-        1.  **The Ownership Gap:** Wealth (`avg_income`) is strongly positively correlated with **Home Ownership**, creating a clear distinction between "owner-occupied" wealthy zones and "tenant-heavy" modest areas.
-        2.  **The Social Housing Trap:** There is a mechanical link between **Social Housing Rate** and **Poverty**, highlighting how vulnerable populations are concentrated in specific administrative planning zones.
-        3.  **Generational Segregation:** A striking negative correlation between **Youth** and **Seniors** suggests territories specialize by age. disproportionately, younger families are found in areas with higher poverty and social housing, while wealthier municipalities tend to aim towards an older demographic profile.
+        1.  **The Exclusionary Nature of Wealth (`-0.65` Income vs. Poverty):** 
+            The extremely strong negative correlation confirms a "zero-sum" landscape. Wealth does not mix with poverty here; it displaces it. As you move closer to Geneva (where income rises), poverty essentially vanishes, creating "gated" economic zones.
         
-        *This structural rigidity suggests that economic mobility is heavily constrained by the local housing market and urban planning history.*
+        2.  **The "Concrete" Fountain of Youth (`+0.40` New Housing vs. Youth):**
+            There is a clear positive link between **New Housing** and **Youth**. This proves that **construction is the primary driver of demographic renewal**. Communes that build invite young families; those that don't age rapidly.
+        
+        3.  **The Great Generational Divide (`-0.77` Youth vs. Senior):**
+            The massive negative correlation between Youth and Seniors indicates **spatial segregation by age**. We don't see "mixed" intergenerational communes. Instead, we see "Young/Active" bedroom communities (likely near the border/new builds) versus "Aging/Retiree" villages (likely dominant in old housing).
+            
+        *Conclusion: To shift the "Rising Tide" (economy) into a demographic future, the territory relies entirely on its ability to build new housing.*
         """)
 
-    # --- Tab 3: Demographics ---
-    with tab3:
+    # --- Tab 4: Demographics ---
+    with tab4:
         st.subheader("Population Structure")
         
         target_data = latest_data # Default to national view (all rows)
@@ -193,8 +203,8 @@ def render(tables, metric="avg_income", regions=None, selected_years=None):
         *This trajectory suggests a successful policy of attracting young families, likely driven by new housing developments or urban renewal projects.*
         """)
 
-    # --- Tab 4: Housing ---
-    with tab4:
+    # --- Tab 5: Housing ---
+    with tab5:
         st.subheader("Housing Stock Analysis")
         
         target_housing = latest_data
@@ -222,8 +232,8 @@ def render(tables, metric="avg_income", regions=None, selected_years=None):
         *This lack of evolution in the housing stock—neither densifying (more apartments) nor diversifying (more social housing)—suggests strict zoning policies that prioritize maintaining the status quo over welcoming new, diverse populations.*
         """)
 
-    # --- Tab 5: Scatter Explorer ---
-    with tab5:
+    # --- Tab 6: Scatter Explorer ---
+    with tab6:
         st.subheader("Multi-Dimensional Exploration")
         st.info("""
         **💡 Recommended Analysis Pairs (What to talk about):**

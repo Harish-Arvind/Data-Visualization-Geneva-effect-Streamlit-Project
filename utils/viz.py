@@ -162,7 +162,7 @@ def correlation_matrix(data, metrics, year=None):
     fig = _apply_layout(fig, title, "", "")
     st.plotly_chart(fig, use_container_width=True)
 
-def scatter_plot(data, x, y, size=None, hover_name="nom", year=None):
+def scatter_plot(data, x, y, size=None, hover_name="nom", color=None, year=None):
     """Plot interaction between two metrics."""
     title = f"{format_metric_label(x)} vs {format_metric_label(y)}"
     if year:
@@ -174,7 +174,7 @@ def scatter_plot(data, x, y, size=None, hover_name="nom", year=None):
         y=y,
         size=size,
         hover_name=hover_name,
-        color=y,
+        color=color if color else y,
         color_continuous_scale="Viridis",
         title=title
     )
@@ -308,8 +308,8 @@ def _prepare_3d_data(_geo_data, metric):
     # Return geo structure via __geo_interface__ for maximum speed (cached)
     return geo_data_proj.__geo_interface__, center_lat, center_lon, max_val
 
-def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
-    """Render a 3D Tilted Map using PyDeck."""
+def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500, highlight_regions=None):
+    """Render a 3D Tilted Map using PyDeck with optional highlighting."""
     if geo_data is None or geo_data.empty:
         st.warning("No geographic data available.")
         return
@@ -324,11 +324,16 @@ def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
 
     label = format_metric_label(metric)
     
-    # Define Layer using GeoJSON Interface
-    geojson_layer = pdk.Layer(
+    layers = []
+    
+    # Base Layer (All Communes)
+    # If highlighting, dim the base layer slightly? Or keep standard.
+    base_opacity = 0.3 if highlight_regions else opacity
+    
+    base_layer = pdk.Layer(
         "GeoJsonLayer",
         data=geo_data_dict, 
-        opacity=opacity,
+        opacity=base_opacity,
         stroked=True,
         filled=True,
         extruded=True,
@@ -341,6 +346,48 @@ def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
         pickable=True,
         auto_highlight=True,
     )
+    layers.append(base_layer)
+    
+    # Highlight Layer (Red)
+    if highlight_regions:
+        # Optimized: Filter from the already-prepared GeoJSON features
+        # This ensures we get all properties (including 'formatted_val') + correct coordinates
+        # without re-running expensive projections.
+        
+        all_features = geo_data_dict.get('features', [])
+        
+        # Filter where 'nom' matches
+        # Note: geo_data merged 'nom' into properties in make_tables usually, but lets verify property access
+        # _prepare_3d_data just does __geo_interface__, which dumps df columns to properties.
+        # So 'nom' should be in feature['properties']['nom'].
+        
+        highlight_features = [
+            f for f in all_features 
+            if f.get('properties', {}).get('nom') in highlight_regions
+        ]
+        
+        if highlight_features:
+            highlight_data = {
+                "type": "FeatureCollection",
+                "features": highlight_features
+            }
+                 
+            highlight_layer = pdk.Layer(
+                "GeoJsonLayer",
+                data=highlight_data,
+                opacity=0.9,
+                stroked=True,
+                filled=True,
+                extruded=True,
+                wireframe=True,
+                get_elevation=f"properties.{metric}",
+                elevation_scale=10 if max_val < 1000 else 0.1,
+                get_fill_color=[255, 0, 0, 200], # Bright Red
+                get_line_color=[255, 255, 0],   # Yellow Outline
+                get_line_width=50,
+                pickable=True,
+            )
+            layers.append(highlight_layer)
 
     # Set View
     view_state = pdk.ViewState(
@@ -353,7 +400,7 @@ def map_chart_3d(geo_data, metric="avg_income", opacity=0.8, height=500):
 
     # Render
     r = pdk.Deck(
-        layers=[geojson_layer],
+        layers=layers,
         initial_view_state=view_state,
         tooltip={"text": "{nom}\n" + label + ": {formatted_val}"},
         map_style="light",

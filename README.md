@@ -48,6 +48,7 @@ data/
 ├── Filosofi2015_carreaux_1000m_metropole.gpkg
 ├── Filosofi2017_carreaux_1km_met.gpkg
 ├── carreaux_1km_met.gpkg  (2019 data)
+├── processed_metrics_cache.pkl
 └── communes2020.gpkg      (Geometries)
 ```
 

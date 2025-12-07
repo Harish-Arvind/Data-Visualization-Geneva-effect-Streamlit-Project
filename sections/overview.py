@@ -2,7 +2,7 @@ import streamlit as st
 from utils.viz import line_chart, bar_chart, map_chart_3d
 from utils.prep import safe_divide
 
-def render(tables, metric="avg_income", selected_years=None):
+def render(tables, metric="avg_income", selected_years=None, regions=None):
     st.header("National Overview: Is the Rising Tide Tilted Towards Geneva?")
     
     st.markdown("""
@@ -87,9 +87,14 @@ def render(tables, metric="avg_income", selected_years=None):
 
     # 2. Map Section (Full Width, Large)
     st.subheader("The Gravity of Geneva: Geographic Wealth Concentration")
-    st.caption("Interactive 3D Map • Tilt: 45° • Height: Scale based on value")
     
-    map_chart_3d(geo_data, metric, height=700)
+    # Highlight Map Data if Regions Selected
+    if regions:
+        st.info(f"📍 Highlighting: {', '.join(regions)}")
+        map_chart_3d(geo_data, metric, height=700, highlight_regions=regions)
+    else:
+        st.caption("Interactive 3D Map • Tilt: 45° • Height: Scale based on value")
+        map_chart_3d(geo_data, metric, height=700)
     
     st.markdown("""
     ### 🏔️ Spatial Analysis: The Topography of Wealth
