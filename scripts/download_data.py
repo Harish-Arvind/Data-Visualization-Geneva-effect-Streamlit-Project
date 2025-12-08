@@ -127,10 +127,8 @@ def download_communes():
         # Keep old file if failure?
         print(f"❌ Error downloading/processing communes: {e}")
 
-if __name__ == "__main__":
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
-        
+def download_all():
+    """Download all datasets required for the app."""
     print("--- Data Download Script ---")
     print("Source: INSEE & Github (France-GeoJSON)")
     
@@ -142,3 +140,9 @@ if __name__ == "__main__":
     download_communes()
     
     print("\nDone.")
+
+if __name__ == "__main__":
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
+        
+    download_all()

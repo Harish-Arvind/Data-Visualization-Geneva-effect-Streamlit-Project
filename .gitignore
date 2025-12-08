@@ -10,10 +10,10 @@ env/
 .DS_Store
 
 # Data
-data/*.gpkg
-data/*.csv
-data/processed_metrics_cache.pkl
-data/communes2020.gpkg 
+# data/*.gpkg
+# data/*.csv
+# data/processed_metrics_cache.pkl
+# data/communes2020.gpkg 
 
 # IDE
 .vscode/
