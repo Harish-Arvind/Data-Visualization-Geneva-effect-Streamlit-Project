@@ -13,7 +13,7 @@ env/
 data/*.gpkg
 data/*.csv
 data/processed_metrics_cache.pkl
-!data/communes2020.gpkg # Un-ignore if this is intended to be tracked, but normally should be ignored too.
+!data/communes2020.gpkg 
 
 # IDE
 .vscode/
